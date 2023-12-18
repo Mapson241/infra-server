@@ -1,5 +1,5 @@
 type: install
-name: GF
+name: Gestion Formation
 id: GF
 categories: ["apps/dev-and-admin-tools"]
 
@@ -20,7 +20,7 @@ nodes:
     count: 1
     cloudlets: 8
     nodeGroup: cp
-    displayName: FrontWeb
+    displayName: GestionFormation
     volumes:
       - /var/www
     
@@ -39,8 +39,7 @@ nodes:
 onInstall:
   - composer
   - git
-  - apacheConf
-  - npm
+  - nvm
   - php
 
 actions:
@@ -55,20 +54,9 @@ actions:
     cmd[cp]: |-
       apt-get install -yqq --no-install-recommends git
       
-  apacheConf:
+  nvm:
     cmd[cp]: |-
-      cd /var/www
-      mkdir public
-      cd /var/www/public
-      touch index.php
-      cd /etc/apache2/sites-enabled
-      rm 000-default.conf
-      wget https://raw.githubusercontent.com/yoanbernabeu/Symfony-Jelastic/main/config/apache.conf
-      apachectl restart
-
-  npm:
-    cmd[cp]: |-
-      apt install nodejs npm
+     curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash && source ~/.profile && nvm install 18.18.1
 
   php:
     cmd[cp]: |-
@@ -76,8 +64,8 @@ actions:
         -o /usr/local/bin/install-php-extensions \
         https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions && \
         chmod +x /usr/local/bin/install-php-extensions && \
-        install-php-extensions intl mysql pdo pdo_mysql 
+        install-php-extensions intl mysql pdo pdo_mysql
 
 
 success: |
-  Your OverKill environment is ready to go!
+  Your Gestion Formation environment is ready to go!
