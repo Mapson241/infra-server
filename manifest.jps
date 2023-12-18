@@ -1,0 +1,83 @@
+type: install
+name: GF
+id: GF
+categories: ["apps/dev-and-admin-tools"]
+
+
+description: |
+  Fichier d'Infrastructure As Code pour le projet "Gestion de Formation"
+  
+ssl: true
+
+nodes:
+  - nodeType: nginx
+    nodeGroup: bl
+    count: 1
+    cloudlets: 8
+    displayName: LoadBalancer
+    
+  - image: php:8.1.2-apache
+    count: 1
+    cloudlets: 8
+    nodeGroup: cp
+    displayName: FrontWeb
+    volumes:
+      - /var/www
+    
+  - nodeType: mysql
+    count: 1
+    cloudlets: 8
+    nodeGroup: sqldb
+    displayName: SQLDB
+    env:
+      password: ${fn.password}
+    volumes:
+       - /var/lib/mysql/data
+    isSLBAccessEnabled: false
+
+  
+onInstall:
+  - composer
+  - git
+  - apacheConf
+  - npm
+  - php
+
+actions:
+  composer:
+    cmd[cp]: |-
+      curl -sS https://getcomposer.org/installer | php
+      mv composer.phar /usr/bin/composer
+      chmod +x /usr/bin/composer
+    user: root
+      
+  git:
+    cmd[cp]: |-
+      apt-get install -yqq --no-install-recommends git
+      
+  apacheConf:
+    cmd[cp]: |-
+      cd /var/www
+      mkdir public
+      cd /var/www/public
+      touch index.php
+      cd /etc/apache2/sites-enabled
+      rm 000-default.conf
+      wget https://raw.githubusercontent.com/yoanbernabeu/Symfony-Jelastic/main/config/apache.conf
+      apachectl restart
+
+  npm:
+    cmd[cp]: |-
+      apt install nodejs npm
+
+  php:
+    cmd[cp]: |-
+        curl -sSLf \
+        -o /usr/local/bin/install-php-extensions \
+        https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions && \
+        chmod +x /usr/local/bin/install-php-extensions && \
+        install-php-extensions intl mysql pdo pdo_mysql 
+
+
+success: |
+  Your OverKill environment is ready to go!
