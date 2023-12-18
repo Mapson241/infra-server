@@ -38,6 +38,7 @@ nodes:
   
 onInstall:
   - composer
+  - apacheConf
   - git
   - nvm
   - php
@@ -53,6 +54,17 @@ actions:
   git:
     cmd[cp]: |-
       apt-get install -yqq --no-install-recommends git
+
+  apacheConf:
+    cmd[cp]: |-
+      cd /var/www
+      mkdir public
+      cd /var/www/public
+      touch index.php
+      cd /etc/apache2/sites-enabled
+      rm 000-default.conf
+      wget https://raw.githubusercontent.com/yoanbernabeu/Symfony-Jelastic/main/config/apache.conf
+      apachectl restart
       
   nvm:
     cmd[cp]: |-
